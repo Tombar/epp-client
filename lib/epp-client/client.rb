@@ -106,44 +106,59 @@ module EPP
     end
 
     def check(payload, extension = nil)
+      mod = module_for_type(payload)
       check = EPP::Commands::Check.new(payload)
-      command(check, extension)
+      resp = command(check, extension)
+      mod::CheckResponse.new(resp)
     end
 
     def create(payload, extension = nil)
+      mod = module_for_type(payload)
       create = EPP::Commands::Create.new(payload)
-      command(create, extension)
+      resp = command(create, extension)
+      mod::CreateResponse.new(resp)
     end
 
     def delete(payload, extension = nil)
+      mod = module_for_type(payload)
       delete = EPP::Commands::Delete.new(payload)
-      command(delete, extension)
+      resp = command(delete, extension)
+      mod::DeleteResponse.new(resp)
     end
 
     def info(payload, extension = nil)
+      mod = module_for_type(payload)
       info = EPP::Commands::Info.new(payload)
-      command(info, extension)
+      resp = command(info, extension)
+      mod::InfoResponse.new(resp)
     end
 
     def renew(payload, extension = nil)
+      mod = module_for_type(payload)
       renew = EPP::Commands::Renew.new(payload)
-      command(renew, extension)
+      resp = command(renew, extension)
+      mod::RenewResponse.new(resp)
     end
 
     def transfer(op, payload, extension = nil)
+      mod = module_for_type(payload)
       transfer = EPP::Commands::Transfer.new(op, payload)
-      command(transfer, extension)
+      resp = command(transfer, extension)
+      mod::TransferResponse.new(resp)
     end
 
     def update(payload, extension = nil)
+      mod = module_for_type(payload)
       update = EPP::Commands::Update.new(payload)
-      command(update, extension)
+      resp = command(update, extension)
+      mod::UpdateResponse.new(resp)
     end
 
     def poll
       poll = EPP::Commands::Poll.new
       command(poll)
     end
+
     def ack(msgID)
       ack = EPP::Commands::Poll.new(msgID)
       command(ack)
@@ -155,6 +170,16 @@ module EPP
           @conn.with_login do
             @conn.request(cmd, extension)
           end
+        end
+      end
+      def module_for_type(name)
+        case name
+        when :domain, 'domain'
+          Domain
+        when :contact, 'contact'
+          Contact
+        when :host, 'host'
+          Host
         end
       end
   end
